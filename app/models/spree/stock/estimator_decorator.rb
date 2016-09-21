@@ -16,6 +16,9 @@ module Spree
 
       def shipping_rates(package)
         shipment = package.easypost_shipment
+
+        log_errors(shipment)
+
         rates = shipment.rates.sort_by { |r| r.rate.to_i }
 
         if rates.any?
@@ -44,6 +47,13 @@ module Spree
 
       private
 
+      def log_errors(shipment)
+        errors = shipment.messages.select { |message| message.type == 'rate_error' }
+        return if errors.empty?
+
+        errors.each { |message| Rails.logger.error "Failed to get shipping rate from carrier #{message[:carrier]} because #{message[:message]}" }
+      end
+
       # Cartons require shipping methods to be present, This will lookup a
       # Shipping method based on the admin(internal)_name. This is not user facing
       # and should not be changed in the admin.
@@ -51,7 +61,7 @@ module Spree
         method_name = "#{ rate.carrier } #{ rate.service }"
         Spree::ShippingMethod.find_or_create_by(admin_name: method_name) do |r|
           r.name = method_name
-          r.display_on = :back_end
+          r.display_on = :both
           r.code = rate.service
           r.calculator = Spree::Calculator::Shipping::FlatRate.create
           r.shipping_categories = [Spree::ShippingCategory.first]
