@@ -51,7 +51,7 @@ module Spree
         errors = shipment.messages.select { |message| message.type == 'rate_error' }
         return if errors.empty?
 
-        errors.each { |message| Rails.logger.error "Failed to get shipping rate from carrier #{message[:carrier]} because #{message[:message]}" }
+        errors.each { |message| Rails.logger.error "Failed to get shipping rate from carrier #{message[:carrier]} because #{message[:message]}, shipment is #{shipment}" }
       end
 
       # Cartons require shipping methods to be present, This will lookup a

@@ -34,7 +34,7 @@ module Spree
 
         address.easypost_address
       rescue ::EasyPost::Error => exception
-        raise EasyPostAddressError, "Unable to get #{purpose} EasyPost address for #{address}"
+        raise EasyPostAddressError, "Unable to get #{purpose} EasyPost address for #{address.easypost_attributes}"
       end
     end
   end

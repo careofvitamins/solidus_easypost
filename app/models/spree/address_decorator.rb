@@ -2,12 +2,16 @@ module Spree
   module EasyPost
     module AddressDecorator
       def easypost_address
+        ::EasyPost::Address.create easypost_attributes
+      end
+
+      def easypost_attributes
         attributes = {
           street1: address1,
           street2: address2,
           city: city,
           zip: zipcode,
-          phone: phone
+          phone: phone,
         }
 
         attributes[:company] = respond_to?(:company)? company : Spree::Store.current.name
@@ -15,7 +19,7 @@ module Spree
         attributes[:state] = state ? state.abbr : state_name
         attributes[:country] = country.try(:iso)
 
-        ::EasyPost::Address.create attributes
+        attributes
       end
     end
   end
