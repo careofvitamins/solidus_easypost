@@ -1,4 +1,5 @@
 require 'spree_core'
+require 'http_logger'
 
 module Spree
   module EasyPost
