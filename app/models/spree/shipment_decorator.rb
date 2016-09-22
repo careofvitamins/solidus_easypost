@@ -35,6 +35,8 @@ module Spree
     end
 
     def buy_easypost_rate
+      return if easypost_shipment.postage_label
+
       rate = easypost_shipment.rates.find do |rate|
         rate.id == selected_easy_post_rate_id
       end
