@@ -16,6 +16,18 @@ module Spree
       end
     end
 
+    def buy_easypost_rate
+      return if easypost_shipment.postage_label
+
+      rate = easypost_shipment.rates.find do |rate|
+        rate.id == selected_easy_post_rate_id
+      end
+
+      easypost_shipment.buy(rate)
+      self.tracking = easypost_shipment.tracking_code
+      self.shipping_duration_days = delivery_days_for_selected_rate
+    end
+
     private
 
     def selected_easy_post_rate_id
@@ -34,15 +46,12 @@ module Spree
       )
     end
 
-    def buy_easypost_rate
-      return if easypost_shipment.postage_label
+    def delivery_days_for_selected_rate
+      value = easypost_shipment.selected_rate.delivery_days
+      return value if value
 
-      rate = easypost_shipment.rates.find do |rate|
-        rate.id == selected_easy_post_rate_id
-      end
-
-      easypost_shipment.buy(rate)
-      self.tracking = easypost_shipment.tracking_code
+      Rails.logger.error "Did not get delivery_days for selected shipping rate. Shipment: #{easypost_shipment}" unless value
+      4
     end
   end
 end
