@@ -35,6 +35,8 @@ module Spree
     end
 
     def selected_easy_post_shipment_id
+      return unless selected_shipping_rate
+
       selected_shipping_rate.easy_post_shipment_id
     end
 
