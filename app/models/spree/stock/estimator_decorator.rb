@@ -25,7 +25,7 @@ module Spree
           spree_rates = rates.map do |rate|
             spree_rate = Spree::ShippingRate.new(
               name: "#{ rate.carrier } #{ rate.service }",
-              cost: rate.rate,
+              cost: 8,
               easy_post_shipment_id: rate.shipment_id,
               easy_post_rate_id: rate.id,
               shipping_method: find_or_create_shipping_method(rate)
