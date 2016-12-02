@@ -23,20 +23,19 @@ module Spree
 
         if rates.any?
           spree_rates = rates.map do |rate|
-            spree_rate = Spree::ShippingRate.new(
+            Spree::ShippingRate.new(
               name: "#{ rate.carrier } #{ rate.service }",
               cost: 8,
               easy_post_shipment_id: rate.shipment_id,
               easy_post_rate_id: rate.id,
               shipping_method: find_or_create_shipping_method(rate)
             )
-
-            spree_rate if spree_rate.shipping_method.frontend?
-          end.compact
+          end
 
           # Sets cheapest rate to be selected by default
           if spree_rates.any?
-            spree_rates.min_by(&:cost).selected = true
+            rate = custom_rate(from: spree_rates, package: package) || spree_rates.min_by(&:cost)
+            rate.selected = true
           end
 
           spree_rates
@@ -47,11 +46,31 @@ module Spree
 
       private
 
+      def custom_rate(from:, package:)
+        special_instructions = package.order.special_instructions
+        return unless special_instructions
+
+        special_instruction_chunks = special_instructions.split(' ').map { |instruction| instruction.split(':') }
+        return if special_instruction_chunks.empty?
+
+        custom_shipping_method = special_instruction_chunks.to_h.with_indifferent_access[:shipping_method]
+        return unless custom_shipping_method
+
+        rate = from.detect{|spree_rate| spree_rate.shipping_method.code == custom_shipping_method}
+        return rate if rate
+
+        raise "Unable to find shipping_method (#{custom_shipping_method}) in available shipping methods"
+      end
+
       def log_errors(shipment)
         errors = shipment.messages.select { |message| message.type == 'rate_error' }
         return if errors.empty?
 
-        errors.each { |message| Rails.logger.error "Failed to get shipping rate from carrier #{message[:carrier]} because #{message[:message]}, shipment is #{shipment}" }
+        errors.each { |message| logger.error "Failed to get shipping rate from carrier #{message[:carrier]} because #{message[:message]}, shipment is #{shipment}" }
+      end
+
+      def logger
+        Rails.logger
       end
 
       # Cartons require shipping methods to be present, This will lookup a
