@@ -25,8 +25,8 @@ module Spree
 
       easypost_shipment.buy(rate)
       self.tracking = easypost_shipment.tracking_code
-      self.shipping_duration_days = delivery_days_for_selected_rate
-      Rails.logger.info "Bought EasyPost shipment with tracking number #{tracking} and shipping duration of #{shipping_duration_days} days"
+      # self.shipping_duration_days = delivery_days_for_selected_rate
+      Rails.logger.info "Bought EasyPost shipment with tracking number #{tracking}"
     end
 
     private
