@@ -25,23 +25,27 @@ module Spree
 
       easypost_shipment.buy(selected_rate)
       update_local_attributes
-      Rails.logger.info "Bought EasyPost shipment with tracking number #{tracking}, " \
-"shipping duration: #{shipping_duration_days} days, estimated delivery date #{estimated_delivery_on}"
     end
 
     def update_local_attributes
+      return unless easypost_shipment
+
       self.tracking = easypost_shipment.tracking_code
       self.shipping_duration_days = delivery_days_for_selected_rate
       self.estimated_delivery_on = estimated_delivery_date
       self.delivery_status = fetch_delivery_status
+
+      Rails.logger.info "Updated shipment #{id} with tracking number #{tracking}, " \
+"shipping duration: #{shipping_duration_days} days, estimated delivery date #{estimated_delivery_on}, " \
+"delivery_status: #{delivery_status}"
 
       true
     end
 
     def estimated_delivery_date
       tracker = easypost_shipment.tracker
-      delivery_event = tracker.tracking_details.detect{|t| t.status == 'delivered' }
-      return delivery_event.datetime.to_date if delivery_event.datetime
+      delivery_event = tracker.tracking_details.detect { |t| t.status == 'delivered' }
+      return delivery_event.datetime.to_date if delivery_event
 
       tracker.est_delivery_date
     end
@@ -66,6 +70,8 @@ module Spree
     end
 
     def build_easypost_shipment
+      return unless address
+
       ::EasyPost::Shipment.create(
         to_address: address.easypost_address,
         from_address: stock_location.easypost_address,
