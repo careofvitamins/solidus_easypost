@@ -32,10 +32,28 @@ module Spree
     def update_local_attributes
       self.tracking = easypost_shipment.tracking_code
       self.shipping_duration_days = delivery_days_for_selected_rate
-      self.estimated_delivery_on = easypost_shipment.tracker.est_delivery_date
+      self.estimated_delivery_on = estimated_delivery_date
+      self.delivery_status = fetch_delivery_status
+
+      true
+    end
+
+    def estimated_delivery_date
+      tracker = easypost_shipment.tracker
+      delivery_event = tracker.tracking_details.detect{|t| t.status == 'delivered' }
+      return delivery_event.datetime.to_date if delivery_event.datetime
+
+      tracker.est_delivery_date
     end
 
     private
+
+    def fetch_delivery_status
+      tracking_details = easypost_shipment.tracker.tracking_details.last
+      return unless tracking_details
+
+      tracking_details.status
+    end
 
     def selected_easy_post_rate_id
       selected_shipping_rate.easy_post_rate_id
