@@ -29,6 +29,7 @@ module Spree
 
     def update_local_attributes
       return unless easypost_shipment
+      return unless selected_shipping_rate
 
       self.tracking = easypost_shipment.tracking_code
       self.shipping_duration_days = delivery_days_for_selected_rate
@@ -43,8 +44,11 @@ module Spree
     end
 
     def estimated_delivery_date
+      return if EasyPostTools.test_mode?
+
       tracker = easypost_shipment.tracker
       delivery_event = tracker.tracking_details.detect { |t| t.status == 'delivered' }
+
       return delivery_event.datetime.to_date if delivery_event
 
       tracker.est_delivery_date
