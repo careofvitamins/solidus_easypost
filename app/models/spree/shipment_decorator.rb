@@ -28,19 +28,7 @@ module Spree
     end
 
     def update_local_attributes
-      return unless easypost_shipment
-      return unless selected_shipping_rate
-
-      self.tracking = easypost_shipment.tracking_code
-      self.shipping_duration_days = delivery_days_for_selected_rate
-      self.estimated_delivery_on = estimated_delivery_date
-      self.delivery_status = fetch_delivery_status
-
-      Rails.logger.info "Updated shipment #{id} with tracking number #{tracking}, " \
-"shipping duration: #{shipping_duration_days} days, estimated delivery date #{estimated_delivery_on}, " \
-"delivery_status: #{delivery_status}"
-
-      true
+      Shipments::UpdateEasypost.new(shipment: self).perform
     end
 
     def estimated_delivery_date
@@ -54,14 +42,25 @@ module Spree
       tracker.est_delivery_date
     end
 
-    private
-
     def fetch_delivery_status
       tracking_details = easypost_shipment.tracker.tracking_details.last
       return unless tracking_details
 
       tracking_details.status
     end
+
+    def delivery_days_for_selected_rate
+      value = easypost_shipment.selected_rate.delivery_days
+      return value if value
+
+      unless value
+        Rails.logger.error 'Did not get delivery_days for selected shipping rate. '\
+"Shipment: #{easypost_shipment}, defaulting to #{default_shipping_days}"
+      end
+      nil
+    end
+
+    private
 
     def selected_easy_post_rate_id
       selected_shipping_rate.easy_post_rate_id
@@ -81,17 +80,6 @@ module Spree
         from_address: stock_location.easypost_address,
         parcel: to_package.easypost_parcel
       )
-    end
-
-    def delivery_days_for_selected_rate
-      value = easypost_shipment.selected_rate.delivery_days
-      return value if value
-
-      unless value
-        Rails.logger.error 'Did not get delivery_days for selected shipping rate. '\
-"Shipment: #{easypost_shipment}, defaulting to #{default_shipping_days}"
-      end
-      nil
     end
   end
 end
