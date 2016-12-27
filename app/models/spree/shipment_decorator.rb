@@ -10,6 +10,7 @@ module Spree
 
     def easypost_shipment
       if selected_easy_post_shipment_id
+        Rails.logger.info "EasyPost Shipment: Retrieving info for #{selected_easy_post_shipment_id}"
         @ep_shipment ||= ::EasyPost::Shipment.retrieve(selected_easy_post_shipment_id)
       else
         @ep_shipment = build_easypost_shipment
@@ -23,6 +24,7 @@ module Spree
         rate.id == selected_easy_post_rate_id
       end
 
+      Rails.logger.info "EasyPost Shipment: Buying rate for #{id}"
       easypost_shipment.buy(selected_rate)
       update_local_attributes
     end
@@ -54,7 +56,7 @@ module Spree
       return value if value
 
       unless value
-        Rails.logger.error 'Did not get delivery_days for selected shipping rate. '\
+        Rails.logger.error 'EasyPost Shipment: Did not get delivery_days for selected shipping rate. '\
 "Shipment: #{easypost_shipment}, defaulting to #{default_shipping_days}"
       end
       nil
@@ -75,6 +77,7 @@ module Spree
     def build_easypost_shipment
       return unless address
 
+      Rails.logger.info "EasyPost Shipment: Creating shipment to #{address.attributes}"
       ::EasyPost::Shipment.create(
         to_address: address.easypost_address,
         from_address: stock_location.easypost_address,
