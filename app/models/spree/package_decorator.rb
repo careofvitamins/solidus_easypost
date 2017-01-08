@@ -20,6 +20,8 @@ module Spree
       end
 
       def easypost_shipment
+        return unless order
+
         ::EasyPost::Shipment.create(
           to_address: easypost_address_for(order.ship_address, :order_ship_address),
           from_address: easypost_address_for(stock_location, :stock_location),

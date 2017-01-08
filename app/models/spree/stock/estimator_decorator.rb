@@ -18,6 +18,7 @@ module Spree
         shipment = package.easypost_shipment
 
         log_errors(shipment)
+        return [] unless shipment
 
         rates = shipment.rates.sort_by { |r| r.rate.to_i }
 
@@ -63,6 +64,8 @@ module Spree
       end
 
       def log_errors(shipment)
+        return logger.error('No shipment found, could not get shipping rates') unless shipment
+
         errors = shipment.messages.select { |message| message.type == 'rate_error' }
         return if errors.empty?
 
