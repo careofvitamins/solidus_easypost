@@ -35,7 +35,7 @@ module Spree
 
           # Sets cheapest rate to be selected by default
           if spree_rates.any?
-            rate = custom_rate(from: spree_rates, package: package) || spree_rates.min_by(&:cost)
+            rate = custom_rate(from: spree_rates, package: package) || default_rate(spree_rates)
             rate.selected = true
           end
 
@@ -46,6 +46,13 @@ module Spree
       end
 
       private
+
+      def default_rate(spree_rates)
+        priority_rate = spree_rates.detect{|spree_rate|  spree_rate.name.include?('Priority')}
+        return priority_rate if priority_rate
+
+        spree_rates.min_by(&:cost)
+      end
 
       def custom_rate(from:, package:)
         special_instructions = package.order.special_instructions
