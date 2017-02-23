@@ -57,7 +57,7 @@ module Spree
 
       unless value
         Rails.logger.error 'EasyPost Shipment: Did not get delivery_days for selected shipping rate. '\
-"Shipment: #{easypost_shipment}, defaulting to #{default_shipping_days}"
+"Shipment: #{easypost_shipment}"
       end
       nil
     end
