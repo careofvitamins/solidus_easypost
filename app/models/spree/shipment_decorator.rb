@@ -79,9 +79,12 @@ module Spree
 
       Rails.logger.info "EasyPost Shipment: Creating shipment to #{address.attributes}"
       ::EasyPost::Shipment.create(
-        to_address: address.easypost_address,
         from_address: stock_location.easypost_address,
-        parcel: to_package.easypost_parcel
+        parcel: to_package.easypost_parcel,
+        print_custom_1: order.number,
+        print_custom_2: order.queue_code,
+        print_custom_3: order.shipments.first.shipped_at.strftime('%m/%d/%Y %H:%M:%S'),
+      to_address: address.easypost_address,
       )
     end
   end

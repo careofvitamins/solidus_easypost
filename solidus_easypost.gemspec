@@ -18,12 +18,17 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'solidus', '> 1.0'
   s.add_dependency 'easypost'
+  s.add_dependency 'http_logger'
 
   s.add_development_dependency 'capybara', '~> 2.1'
   s.add_development_dependency 'coffee-rails'
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'factory_girl', '~> 4.4'
   s.add_development_dependency 'ffaker'
+  s.add_development_dependency 'pry-byebug'
+  s.add_development_dependency 'pry-rails'
+  s.add_development_dependency 'pry-rescue'
+  s.add_development_dependency 'pry-stack_explorer'
   s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'sass-rails'
   s.add_development_dependency 'selenium-webdriver'

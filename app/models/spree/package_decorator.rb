@@ -23,9 +23,12 @@ module Spree
         return unless order
 
         ::EasyPost::Shipment.create(
-          to_address: easypost_address_for(order.ship_address, :order_ship_address),
           from_address: easypost_address_for(stock_location, :stock_location),
-          parcel: easypost_parcel
+          parcel: easypost_parcel,
+          print_custom_1: order.number,
+          print_custom_2: order.queue_code,
+          print_custom_3: order.shipments.first.shipped_at.strftime('%m/%d/%Y %H:%M:%S'),
+        to_address: easypost_address_for(order.ship_address, :order_ship_address),
         )
       end
 

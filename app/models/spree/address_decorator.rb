@@ -1,12 +1,10 @@
 module Spree
   module EasyPost
     module AddressDecorator
-      include SemanticLogger::Loggable
-
       def easypost_address
         ::EasyPost::Address.create easypost_attributes
       rescue => exception
-        logger.error "Unable to create EasyPost address: #{exception.class} - #{exception.message} with attributes #{easypost_attributes}"
+        Rails.logger.error "Unable to create EasyPost address: #{exception.class} - #{exception.message} with attributes #{easypost_attributes}"
       end
 
       def easypost_attributes
