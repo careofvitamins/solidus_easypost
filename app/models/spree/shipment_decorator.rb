@@ -77,15 +77,19 @@ module Spree
     def build_easypost_shipment
       return unless address
 
-      Rails.logger.info "EasyPost Shipment: Creating shipment to #{address.attributes}"
-      ::EasyPost::Shipment.create(
-        from_address: stock_location.easypost_address,
-        parcel: to_package.easypost_parcel,
-        print_custom_1: order.number,
-        print_custom_2: order.queue_code,
-        print_custom_3: Time.zone.now.strftime('%m/%d/%Y %H:%M:%S'),
-      to_address: address.easypost_address,
-      )
+      ship_to = address.easypost_address
+      attributes = {
+          from_address: stock_location.easypost_address,
+              parcel: to_package.easypost_parcel,
+              print_custom_1: order.number,
+              print_custom_2: order.queue_code,
+              print_custom_3: Time.zone.now.strftime('%m/%d/%Y %H:%M:%S'),
+              to_address: ship_to,
+      }
+      shipment = ::EasyPost::Shipment.create(attributes)
+      Rails.logger.info "EasyPost Shipment: Created shipment to #{ship_to.attributes} with attributes #{attributes}"
+
+      shipment
     end
   end
 end

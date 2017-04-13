@@ -22,14 +22,19 @@ module Spree
       def easypost_shipment
         return unless order
 
-        ::EasyPost::Shipment.create(
-          from_address: easypost_address_for(stock_location, :stock_location),
-          parcel: easypost_parcel,
-          print_custom_1: order.number,
-          print_custom_2: order.queue_code,
-          print_custom_3: Time.zone.now.strftime('%m/%d/%Y %H:%M:%S'),
-        to_address: easypost_address_for(order.ship_address, :order_ship_address),
-        )
+        ship_to = order.ship_address
+        attributes = {
+            from_address: easypost_address_for(stock_location, :stock_location),
+                parcel: easypost_parcel,
+                print_custom_1: order.number,
+                print_custom_2: order.queue_code,
+                print_custom_3: Time.zone.now.strftime('%m/%d/%Y %H:%M:%S'),
+                to_address: easypost_address_for(ship_to, :order_ship_address),
+        }
+        shipment = ::EasyPost::Shipment.create(attributes)
+        Rails.logger.info "EasyPost Shipment: Created shipment to #{ship_to.attributes} with attributes #{attributes}"
+
+        shipment
       end
 
       private
