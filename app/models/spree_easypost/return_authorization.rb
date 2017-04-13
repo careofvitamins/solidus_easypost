@@ -18,7 +18,7 @@ module Spree
           from_address: stock_location.easypost_address,
           to_address: order.ship_address.easypost_address,
           parcel: build_parcel,
-          is_return: true
+          is_return: true,
         )
       end
 

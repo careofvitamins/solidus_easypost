@@ -4,7 +4,7 @@ module Spree
       mod.state_machine.before_transition(
         to: :shipped,
         do: :buy_easypost_rate,
-        if: -> { Spree::EasyPost::CONFIGS[:purchase_labels?] }
+        if: -> { Spree::EasyPost::CONFIGS[:purchase_labels?] },
       )
     end
 
@@ -79,12 +79,12 @@ module Spree
 
       ship_to = address.easypost_address
       attributes = {
-          from_address: stock_location.easypost_address,
-              parcel: to_package.easypost_parcel,
-              print_custom_1: order.number,
-              print_custom_2: order.queue_code,
-              print_custom_3: Time.zone.now.strftime('%m/%d/%Y %H:%M:%S'),
-              to_address: ship_to,
+        from_address: stock_location.easypost_address,
+        parcel: to_package.easypost_parcel,
+        print_custom_1: order.number,
+        print_custom_2: order.queue_code,
+        print_custom_3: Time.zone.now.strftime('%m/%d/%Y %H:%M:%S'),
+        to_address: ship_to,
       }
       shipment = ::EasyPost::Shipment.create(attributes)
       Rails.logger.info "EasyPost Shipment: Created shipment to #{ship_to.attributes} with attributes #{attributes}"

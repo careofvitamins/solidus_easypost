@@ -8,7 +8,7 @@ module Spree
       # This is added here to allow a version of the easypost gem to be
       # compatible with both pre and post v1.3 versions and initialize
       # an Estimator in the specs
-      def initialize(order=nil)
+      def initialize(order = nil)
         return unless order
         @order = order
         @currency = order.currency
@@ -25,11 +25,11 @@ module Spree
         if rates.any?
           spree_rates = rates.map do |rate|
             Spree::ShippingRate.new(
-              name: "#{ rate.carrier } #{ rate.service }",
+              name: "#{rate.carrier} #{rate.service}",
               cost: 8,
               easy_post_shipment_id: rate.shipment_id,
               easy_post_rate_id: rate.id,
-              shipping_method: find_or_create_shipping_method(rate)
+              shipping_method: find_or_create_shipping_method(rate),
             )
           end
 
@@ -48,7 +48,7 @@ module Spree
       private
 
       def default_rate(spree_rates)
-        priority_rate = spree_rates.detect{|spree_rate|  spree_rate.name.include?('Priority')}
+        priority_rate = spree_rates.detect { |spree_rate| spree_rate.name.include?('Priority') }
         return priority_rate if priority_rate
 
         spree_rates.min_by(&:cost)
@@ -64,7 +64,7 @@ module Spree
         custom_shipping_method = special_instruction_chunks.to_h.with_indifferent_access[:shipping_method]
         return unless custom_shipping_method
 
-        rate = from.detect{|spree_rate| spree_rate.shipping_method.code == custom_shipping_method}
+        rate = from.detect { |spree_rate| spree_rate.shipping_method.code == custom_shipping_method }
         return rate if rate
 
         raise "Unable to find shipping_method (#{custom_shipping_method}) in available shipping methods"
@@ -87,7 +87,7 @@ module Spree
       # Shipping method based on the admin(internal)_name. This is not user facing
       # and should not be changed in the admin.
       def find_or_create_shipping_method(rate)
-        method_name = "#{ rate.carrier } #{ rate.service }"
+        method_name = "#{rate.carrier} #{rate.service}"
         Spree::ShippingMethod.find_or_create_by(admin_name: method_name) do |r|
           r.name = method_name
           r.display_on = :both

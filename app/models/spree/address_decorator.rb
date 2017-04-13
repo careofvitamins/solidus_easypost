@@ -16,7 +16,7 @@ module Spree
           phone: phone,
         }
 
-        attributes[:company] = respond_to?(:company)? company : Spree::Store.default.name
+        attributes[:company] = respond_to?(:company) ? company : Spree::Store.default.name
         attributes[:name] = full_name if respond_to?(:full_name)
         attributes[:state] = state ? state.abbr : state_name
         attributes[:country] = country.try(:iso)
