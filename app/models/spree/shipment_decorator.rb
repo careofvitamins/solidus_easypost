@@ -81,9 +81,11 @@ module Spree
       attributes = {
         from_address: stock_location.easypost_address,
         parcel: to_package.easypost_parcel,
-        print_custom_1: order.number,
-        print_custom_2: order.queue_code,
-        print_custom_3: Time.zone.now.strftime('%m/%d/%Y %H:%M:%S'),
+        options: {
+          print_custom_1: order.number,
+          print_custom_2: order.queue_code,
+          print_custom_3: Time.zone.now.strftime('%m/%d/%Y %H:%M:%S'),
+        },
         to_address: ship_to,
       }
       shipment = ::EasyPost::Shipment.create(attributes)
