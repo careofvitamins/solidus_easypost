@@ -37,6 +37,8 @@ module Spree
       return if EasyPostTools.test_mode?
 
       tracker = easypost_shipment.tracker
+      return unless tracker
+
       delivery_event = tracker.tracking_details.detect { |t| t.status == 'delivered' }
 
       return delivery_event.datetime.to_date if delivery_event
@@ -45,14 +47,20 @@ module Spree
     end
 
     def fetch_delivery_status
-      tracking_details = easypost_shipment.tracker.tracking_details.last
+      tracker = easypost_shipment.tracker
+      return unless tracker
+
+      tracking_details = tracker.tracking_details.last
       return unless tracking_details
 
       tracking_details.status
     end
 
     def delivery_days_for_selected_rate
-      value = easypost_shipment.selected_rate.delivery_days
+      selected_rate = easypost_shipment.selected_rate
+      return unless selected_rate
+
+      value = selected_rate.delivery_days
       return value if value
 
       unless value
