@@ -97,7 +97,7 @@ module Spree
         to_address: ship_to,
       }
       shipment = ::EasyPost::Shipment.create(attributes)
-      Rails.logger.info "EasyPost Shipment: Created shipment to #{ship_to.attributes} with attributes #{attributes}"
+      Rails.logger.info "EasyPost Shipment: Created shipment to #{ship_to.id} with attributes #{attributes}"
 
       shipment
     end
