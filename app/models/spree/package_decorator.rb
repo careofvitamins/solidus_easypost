@@ -7,7 +7,7 @@ module Spree
       end
 
       def easypost_parcel
-        total_weight = 18
+        total_weight = 15
 
         create_easypost_parcel(total_weight)
       end
