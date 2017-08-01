@@ -48,8 +48,8 @@ module Spree
       private
 
       def default_rate(spree_rates)
-        priority_rate = spree_rates.detect { |spree_rate| spree_rate.name.include?('Priority') }
-        return priority_rate if priority_rate
+        first_class_rate = spree_rates.detect { |spree_rate| spree_rate.name.include?('First') }
+        return first_class_rate if first_class_rate
 
         spree_rates.min_by(&:cost)
       end
