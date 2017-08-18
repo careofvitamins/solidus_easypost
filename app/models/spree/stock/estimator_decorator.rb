@@ -48,8 +48,8 @@ module Spree
       private
 
       def default_rate(spree_rates)
-        first_class_rate = spree_rates.detect { |spree_rate| spree_rate.name.include?('First') }
-        return first_class_rate if first_class_rate
+        preferred_rate = spree_rates.detect { |spree_rate| spree_rate.name.include?('SMART_POST') }
+        return preferred_rate if preferred_rate
 
         spree_rates.min_by(&:cost)
       end
