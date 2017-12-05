@@ -13,7 +13,12 @@ module Spree
       end
 
       def create_easypost_parcel(total_weight)
-        ::EasyPost::Parcel.create weight: total_weight
+        ::EasyPost::Parcel.create(
+          length: 9.25,
+          width: 4.75,
+          height: 4.75,
+          weight: total_weight,
+        )
       rescue ::EasyPost::Error => exception
         raise EasyPostParcelError, "Unable to get EasyPost parcel for weight #{total_weight}"
       end
