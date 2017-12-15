@@ -7,9 +7,7 @@ module Spree
       end
 
       def easypost_parcel
-        total_weight = 18
-
-        create_easypost_parcel(total_weight)
+        create_easypost_parcel(Orders::WeightPerShipment.new(order: order).result)
       end
 
       def create_easypost_parcel(total_weight)
