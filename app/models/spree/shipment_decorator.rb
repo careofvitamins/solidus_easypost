@@ -20,13 +20,14 @@ module Spree
     def buy_easypost_rate
       return if easypost_shipment.postage_label
 
-      selected_rate = easypost_shipment.rates.find do |rate|
-        rate.id == selected_easy_post_rate_id
-      end
+      begin
+        buy_rate
+      rescue => error
+        raise error unless error.code == 'SHIPMENT.POSTAGE.FAILURE'
 
-      Rails.logger.info "EasyPost Shipment: Buying rate for #{id}"
-      easypost_shipment.buy(selected_rate)
-      update_local_attributes
+        force_refresh_rates
+        buy_rate
+      end
     end
 
     def update_local_attributes
@@ -71,6 +72,30 @@ module Spree
     end
 
     private
+
+    def buy_rate
+      selected_rate = easypost_shipment.rates.find do |rate|
+        rate.id == selected_easy_post_rate_id
+      end
+
+      Rails.logger.info "EasyPost Shipment: Buying rate for #{id}"
+      easypost_shipment.buy(selected_rate)
+      update_local_attributes
+    end
+
+    def force_refresh_rates
+      easypost_shipment.get_rates
+      new_rates = Spree::Config.stock.estimator_class.new.shipping_rates(to_package)
+      return unless new_rates.any?
+
+      selected_rate = new_rates.detect { |rate| rate.shipping_method_id == shipping_method.try!(:id) }
+      if selected_rate
+        new_rates.each { |rate| rate.selected = (rate == selected_rate) }
+      end
+
+      self.shipping_rates = new_rates
+      save!
+    end
 
     def selected_easy_post_rate_id
       selected_shipping_rate.easy_post_rate_id
