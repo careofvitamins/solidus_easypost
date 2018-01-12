@@ -48,10 +48,7 @@ module Spree
       private
 
       def default_rate(spree_rates)
-        priority_rate = spree_rates.detect { |spree_rate| spree_rate.name.include?('Priority') }
-        return priority_rate if priority_rate
-
-        spree_rates.min_by(&:cost)
+        spree_rates.select{|rate| rate.name.starts_with?('USPS ')}.sort_by(&:cost).first
       end
 
       def custom_rate(from:, package:)
