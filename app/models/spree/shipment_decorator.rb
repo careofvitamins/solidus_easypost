@@ -20,8 +20,15 @@ module Spree
     def buy_easypost_rate
       return if easypost_shipment.postage_label
 
-      force_refresh_rates
-      buy_rate
+      begin
+        force_refresh_rates if ENV['feature_refresh_rates_on_label_purchase'] == 'true'
+        buy_rate
+      rescue => error
+        raise error unless error.code == 'SHIPMENT.POSTAGE.FAILURE'
+
+        force_refresh_rates
+        buy_rate
+      end
     end
 
     def update_local_attributes
