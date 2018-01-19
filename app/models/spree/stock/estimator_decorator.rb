@@ -48,7 +48,7 @@ module Spree
       private
 
       def default_rate(spree_rates)
-        spree_rates.select{|rate| ['USPS First', 'USPS Priority'].include?(rate.name) }.sort_by(&:cost).first
+        spree_rates.select { |rate| ['USPS First', 'USPS Priority'].include?(rate.name) }.first
       end
 
       def custom_rate(from:, package:)
