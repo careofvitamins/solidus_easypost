@@ -91,6 +91,7 @@ module Spree
 
       self.shipping_rates = new_rates
       save!
+      @ep_shipment = nil
     end
 
     def selected_easy_post_rate_id
