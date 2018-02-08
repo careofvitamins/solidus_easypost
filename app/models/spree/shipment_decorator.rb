@@ -87,12 +87,7 @@ module Spree
     def force_refresh_rates
       easypost_shipment.get_rates
       new_rates = Spree::Config.stock.estimator_class.new.shipping_rates(to_package)
-      return unless new_rates.any?
-
-      selected_rate = new_rates.detect { |rate| rate.shipping_method_id == shipping_method.try!(:id) }
-      if selected_rate
-        new_rates.each { |rate| rate.selected = (rate == selected_rate) }
-      end
+      return unless new_rates.any?(&:selected)
 
       self.shipping_rates = new_rates
       save!
