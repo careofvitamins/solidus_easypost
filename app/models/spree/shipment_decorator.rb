@@ -105,9 +105,9 @@ module Spree
     end
 
     def build_easypost_shipment
-      return unless address
+      return unless order.ship_address
 
-      ship_to = address.easypost_address
+      ship_to = order.ship_address.easypost_address
       attributes = {
         from_address: stock_location.easypost_address,
         parcel: to_package.easypost_parcel,
