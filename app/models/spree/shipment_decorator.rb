@@ -32,20 +32,48 @@ module Spree
     end
 
     def update_local_attributes
-      Shipments::UpdateEasypost.new(shipment: self).perform
+      self.assign_attributes(
+        delivery_status: easypost_delivery_status,
+        easypost_tracking_url: easypost_public_url,
+        estimated_delivery_on: estimated_delivery_date,
+        shipping_duration_days: delivery_days_for_selected_rate,
+        tracking: easypost_tracking_code,
+      )
     end
 
     def estimated_delivery_date
       return if EasyPostTools.test_mode?
+      return unless easypost_tracker
 
-      tracker = easypost_shipment.tracker
-      return unless tracker
-
-      delivery_event = tracker.tracking_details.detect { |t| t.status == 'delivered' }
+      delivery_event = easypost_tracker.tracking_details.detect { |t| t.status == 'delivered' }
 
       return delivery_event.datetime.to_date if delivery_event
 
-      tracker.est_delivery_date
+      easypost_tracker.est_delivery_date
+    end
+
+    def easypost_delivery_status
+      return unless easypost_tracker
+
+      easypost_tracker.status
+    end
+
+    def easypost_public_url
+      return unless easypost_tracker
+
+      easypost_tracker.public_url
+    end
+
+    def easypost_tracking_code
+      return unless easypost_tracker
+
+      easypost_tracker.tracking_code
+    end
+
+    def easypost_tracker
+      return unless easypost_shipment
+
+      easypost_shipment.tracker
     end
 
     def fetch_delivery_status
