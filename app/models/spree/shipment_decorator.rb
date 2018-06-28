@@ -100,9 +100,25 @@ module Spree
       nil
     end
 
+    def stickied_shipping_method_name
+      return unless sticky_shipping
+
+      shipping_method.name
+    end
+
+    def select_stickied_method(rates)
+      stickied_rate = rates.detect { |rate| rate.name == stickied_shipping_method_name }
+      return unless stickied_rate
+
+      rates.map! { |rate| rate.selected = rate == stickied_rate }
+    end
+
     def force_refresh_rates
       easypost_shipment.get_rates
       new_rates = Spree::Config.stock.estimator_class.new.shipping_rates(to_package)
+
+      select_stickied_method(rates) if stickied_shipping_method_name
+
       return unless new_rates.any?(&:selected)
 
       self.shipping_rates = new_rates
