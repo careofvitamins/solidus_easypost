@@ -110,7 +110,7 @@ module Spree
       stickied_rate = rates.detect { |rate| rate.name == stickied_shipping_method_name }
       return unless stickied_rate
 
-      rates.map! { |rate| rate.selected = rate == stickied_rate }
+      rates.each { |rate| rate.selected = rate == stickied_rate }
     end
 
     def force_refresh_rates
