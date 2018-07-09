@@ -101,7 +101,7 @@ module Spree
     end
 
     def stickied_shipping_method_name
-      return unless sticky_shipping
+      return unless stickied_at
 
       shipping_method.name
     end
