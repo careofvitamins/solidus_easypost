@@ -100,6 +100,32 @@ module Spree
       nil
     end
 
+    def stickied_shipping_method_name
+      return unless stickied_at
+
+      shipping_method.name
+    end
+
+    def select_stickied_method(rates)
+      stickied_rate = rates.detect { |rate| rate.name == stickied_shipping_method_name }
+      return unless stickied_rate
+
+      rates.each { |rate| rate.selected = rate == stickied_rate }
+    end
+
+    def force_refresh_rates
+      easypost_shipment.get_rates
+      new_rates = Spree::Config.stock.estimator_class.new.shipping_rates(to_package)
+
+      select_stickied_method(rates) if stickied_shipping_method_name
+
+      return unless new_rates.any?(&:selected)
+
+      self.shipping_rates = new_rates
+      save!
+      @ep_shipment = nil
+    end
+
     private
 
     def buy_rate
@@ -110,16 +136,6 @@ module Spree
       Rails.logger.info "EasyPost Shipment: Buying rate for #{id}"
       easypost_shipment.buy(selected_rate)
       update_local_attributes
-    end
-
-    def force_refresh_rates
-      easypost_shipment.get_rates
-      new_rates = Spree::Config.stock.estimator_class.new.shipping_rates(to_package)
-      return unless new_rates.any?(&:selected)
-
-      self.shipping_rates = new_rates
-      save!
-      @ep_shipment = nil
     end
 
     def selected_easy_post_rate_id
