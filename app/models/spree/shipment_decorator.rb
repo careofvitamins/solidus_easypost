@@ -117,7 +117,7 @@ module Spree
       easypost_shipment.get_rates
       new_rates = Spree::Config.stock.estimator_class.new.shipping_rates(to_package)
 
-      select_stickied_method(rates) if stickied_shipping_method_name
+      select_stickied_method(new_rates) if stickied_shipping_method_name
 
       return unless new_rates.any?(&:selected)
 
