@@ -24,7 +24,7 @@ module Spree
         force_refresh_rates if ENV['feature_refresh_rates_on_label_purchase'] == 'true'
         buy_rate
       rescue => error
-        raise error unless error.code == 'SHIPMENT.POSTAGE.FAILURE'
+        raise error unless error.try(:code) == 'SHIPMENT.POSTAGE.FAILURE'
 
         force_refresh_rates
         buy_rate
